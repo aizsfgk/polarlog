@@ -1,12 +1,11 @@
-
 #include "file_appender.h"
 
 namespace polarlog {
 
 FileAppender::FileAppender()
 {
-
 }
+
 int FileAppender::init(std::string file, std::string dir)
 {
 	if (file.empty()) {

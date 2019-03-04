@@ -1,9 +1,7 @@
-#include "config.h"
 #include <map>
 #include <sstream>
 #include <fstream>
-
-
+#include "config.h"
 
 namespace polarlog {
 

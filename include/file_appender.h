@@ -12,13 +12,9 @@
 #include <cstdlib>
 #include <errno.h>
 #include <sys/stat.h>
-
 #include "define.h"
 
-
-
 namespace polarlog {
-
 
 class FileAppender
 {

@@ -12,11 +12,9 @@
 #include <cstdlib>
 #include <errno.h>
 #include <stdio.h>
-
 #include "file_appender.h"
 #include "define.h"
 #include "config.h"
-
 
 const int LEVEL_ERROR = 1;
 const int LEVEL_WARN  = 2;
@@ -39,10 +37,6 @@ const int LEVEL_DEBUG = 4;
 
 #define LOG(level, msg)  \
 	LOG_##level("%s", msg) 
-
-
-
-
 
 extern "C" {
 
@@ -87,6 +81,5 @@ private:
 };
 
 }
-
 
 #endif

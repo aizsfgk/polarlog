@@ -1,6 +1,4 @@
-
 #include "polarlog.h"
-
 
 namespace polarlog {
 
@@ -146,13 +144,14 @@ std::string Polarlog::get_log_level_str(int level)
 } // end namespace polarlog
 
 
+// =============== API =============== //
+
 polarlog::Polarlog *gp_logger;
 polarlog::FileAppender gp_file_appender;
 
-
+// TODO
 int polarlog_init(const std::string &file, const std::string &dir)
 {
-	// polarlog::FileAppender gp_file_appender = new polarlog::FileAppender();
 	gp_logger = new polarlog::Polarlog(&gp_file_appender);
 	gp_logger->init(file, dir);
 	return 0;
@@ -166,11 +165,7 @@ void polarlog_write(int level, int line, const char *file, const char *format, .
 
 	va_list ap;
 	va_start(ap, format);
-
 	gp_logger->log(level, line, file, format, ap);
-
-	//_log(format, ap);
-
 	va_end(ap);
 }
 
@@ -190,10 +185,8 @@ const char *polarlog_get_level()
 void polarlog_end()
 {
 	delete gp_logger;
-	//delete gp_file_appender;
 	return;
 }
-
 
 void polarlog_reload(int sig)
 {
@@ -204,4 +197,3 @@ void polarlog_reload(int sig)
 		gp_logger->_check_config_file();
 	}
 }
-

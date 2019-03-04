@@ -2,8 +2,6 @@
 #define _POLARLOG_DEFINE_H_
 
 #define LOG_MAX_SIZE 4096
-
 #define ONE_DAY_SECONDS 86400
-
 
 #endif
