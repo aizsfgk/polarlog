@@ -10,13 +10,17 @@ LIBS = -lstdc++ -lpthread -ldl
 CXXFLAGS = -g -Wall -O0 -fPIC -fno-strict-aliasing -fno-omit-frame-pointer
 
 TARGET_FIEL = polarlog_main
+TARGET_LIB = ./lib/libpolarlog.a
+AR_TOOL = ar -r
 
 
 
-all : $(TARGET_FIEL)
+all : $(TARGET_LIB)
 	@echo "===source_files====\n"
 	@echo $(SOURCE_FILES)
 
+$(TARGET_LIB) : $(OBJECT_FILES)
+	$(AR_TOOL) $(TARGET_LIB) $(OBJECT_FILES)
 
 $(TARGET_FIEL) : $(OBJECT_FILES)
 	$(CC) -I$(HEARDER_DIRS) $(LIBS) $(OBJECT_FILES) ./src/main.cpp -o $@
@@ -26,5 +30,5 @@ $(TARGET_FIEL) : $(OBJECT_FILES)
 
 clean :
 	rm -rf $(OBJECT_FILES)
-	rm $(TARGET_FIEL)
+	#rm $(TARGET_FIEL)
 	rm -rf ./log

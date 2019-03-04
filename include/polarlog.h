@@ -38,6 +38,9 @@ const int LEVEL_DEBUG = 4;
 #define LOG(level, msg)  \
 	LOG_##level("%s", msg) 
 
+#define LOG_COMMON(level, line, file, format, args...) \
+	polarlog_write(level, line, file, format, ##args);
+
 extern "C" {
 
 int  polarlog_init(const std::string &file, const std::string &dir);
