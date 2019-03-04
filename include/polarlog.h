@@ -7,7 +7,15 @@
 #include <string>
 #include <fstream>
 #include <map>
+#include <cstdio>
+#include <unistd.h>
+#include <cstdlib>
+#include <errno.h>
+#include <stdio.h>
 
+#include "file_appender.h"
+#include "define.h"
+#include "config.h"
 
 
 const int LEVEL_ERROR = 1;
@@ -33,9 +41,7 @@ const int LEVEL_DEBUG = 4;
 	LOG_##level("%s", msg) 
 
 
-#define LOG_MAX_SIZE 4096
 
-#define ONE_DAY_SECONDS 86400
 
 
 extern "C" {
@@ -43,37 +49,9 @@ extern "C" {
 int  polarlog_init(const std::string &file, const std::string &dir);
 void polarlog_write(int level, int line, const char *file, const char *format, ...);
 void polarlog_set_level(const char *level);
+const char *polarlog_get_level();
 void polarlog_end();
 void polarlog_reload(int sig);
-
-}
-
-namespace polarlog {
-
-
-class FileAppender
-{
-public:
-	FileAppender();
-	~FileAppender();
-	int init(std::string file, std::string dir);
-	bool is_inited();
-	int write_log(char *log, const char *format, va_list ap);
-	int shift_log_file(time_t tt);
-	int shift_log_if_need(time_t tt);
-	int delete_old_log(time_t tt);
-	void set_remain_day(int day);
-
-private:
-	std::fstream _fs;
-	std::string _log_file;
-	std::string _log_dir;
-	std::string _log_path_file;
-	bool _is_inited;
-	int _remain_day;
-	long _last_sec;
-	pthread_mutex_t _rw_mutex;
-};
 
 }
 
@@ -83,9 +61,9 @@ class Polarlog
 {
 public:
 	Polarlog() : 
-		_file_appener(NULL),_log_level(LEVEL_DEBUG),_config_file(""),_is_use_fa(false) {} 
+		_file_appender(NULL),_log_level(LEVEL_DEBUG),_config_file(""),_is_use_fa(false) {} 
 	Polarlog(FileAppender *fa) : 
-		_file_appener(fa),_log_level(LEVEL_DEBUG),_config_file(""),_is_use_fa(true) {} 
+		_file_appender(fa),_log_level(LEVEL_DEBUG),_config_file(""),_is_use_fa(true) {} 
 	~Polarlog();
 	int init(const std::string &file, const std::string &dir);
 	void log(int level, int line, const char *file, const char *format, va_list ap);
@@ -99,7 +77,7 @@ public:
 
 private:
 	
-	FileAppender *_file_appener;
+	FileAppender *_file_appender;
 	std::map<std::string, std::string> _config_map;
 	int _log_level;
 	std::string _config_file;
@@ -107,9 +85,6 @@ private:
 	bool _is_use_fa;
 
 };
-
-
-
 
 }
 

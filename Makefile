@@ -27,3 +27,4 @@ $(TARGET_FIEL) : $(OBJECT_FILES)
 clean :
 	rm -rf $(OBJECT_FILES)
 	rm $(TARGET_FIEL)
+	rm -rf ./log
