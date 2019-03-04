@@ -1,3 +1,6 @@
+#ifndef _POLORLOG_FILE_APPENDER_H_
+#define _POLORLOG_FILE_APPENDER_H_
+
 #include <string>
 #include <sys/time.h>
 #include <cstring>
@@ -42,3 +45,5 @@ private:
 };
 
 }
+
+#endif
