@@ -40,6 +40,7 @@ int Polarlog::init(const std::string &conf_file, const std::string &conf_dir)
 
 		if (_config_map.find("log_file") == _config_map.end()) {
 			printf("FALTAL: log_file field is null\n");
+			return -1;
 		}
 		_file_appener->init(_config_map["log_file"], _config_map["log_dir"]);
 	} else {
@@ -73,7 +74,7 @@ void Polarlog::log(int level, int line, const char *file, const char *format, va
 	if (level <= _log_level) {
 
 		//std::string fin_format = "[%s][%s][%s/%d]" + format;
-		printf("_log_level: %d\n", _log_level);
+
 
 		std::string level_str = get_log_level_str(level);
 		time_t tt = time(NULL);
@@ -305,14 +306,15 @@ int FileAppender::delete_old_log(time_t tt)
 
 
 // extern polarlog::Polarlog gp_logger;
-polarlog::FileAppender gp_file_appender;
 polarlog::Polarlog *gp_logger;
+// polarlog::FileAppender gp_file_appender;
+polarlog::FileAppender gp_file_appender;
 
 
 int polarlog_init(const std::string &file, const std::string &dir)
 {
 	// polarlog::FileAppender gp_file_appender = new polarlog::FileAppender();
-	polarlog::Polarlog *gp_logger = new polarlog::Polarlog(&gp_file_appender);
+	gp_logger = new polarlog::Polarlog(&gp_file_appender);
 	gp_logger->init(file, dir);
 	return 0;
 }
