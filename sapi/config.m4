@@ -2,7 +2,6 @@ dnl $Id$
 dnl m4是一种宏语言
 dnl config.m4 for extension tou
 
-
 PHP_ARG_ENABLE(tou, whether to enable tou support,
 dnl Make sure that the comment is aligned:
 [  --enable-polarlog           Enable tou support])
@@ -11,7 +10,6 @@ if test "$PHP_POLARLOG" != "no"; then
   
   BUILD_PATH="/Users/zhangshifeng01/app/polarlog"
   ROOT_PATH=$BUILD_PATH
-
 
   AC_MSG_CHECKING($ROOT_PATH)
 

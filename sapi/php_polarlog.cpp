@@ -33,6 +33,7 @@ PHP_FUNCTION(polarlog_set_level)
 	if (strlen(level) == 0) {
 		level = "DEBUG";
 	}
+	
 	if (strcasecmp(level, "ERROR") == 0 ||
 		strcasecmp(level, "WARN")  == 0 ||
 		strcasecmp(level, "INFO")  == 0 ||
