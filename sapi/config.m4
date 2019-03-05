@@ -1,7 +1,6 @@
 dnl $Id$
-dnl m4是一种宏语言
-dnl config.m4 for extension tou
 
+dnl 激活扩展，默认激活
 PHP_ARG_ENABLE(tou, whether to enable tou support,
 dnl Make sure that the comment is aligned:
 [  --enable-polarlog           Enable tou support])
@@ -20,7 +19,6 @@ if test "$PHP_POLARLOG" != "no"; then
     AC_MSG_ERROR([please install polarlog files])
   fi
 
- 
   dnl 添加头文件
   PHP_ADD_INCLUDE($ROOT_PATH/include)
   PHP_ADD_INCLUDE($ROOT_PATH/sapi)
@@ -29,12 +27,12 @@ if test "$PHP_POLARLOG" != "no"; then
   dnl 需要C++编译器
   PHP_REQUIRE_CXX()
   
+  dnl 编译标识
   CXXFLAGS="-g -O0 -DDEBUG -shared -fPIC -rdynamic -finline-functions -pipe -std=c++11 $CPPFLAGS"
   LDFLAGS="-Bstatic $LDFLAGS"
 
   dnl 库的链接顺序，也会报找不到符号的错误
   dnl 依赖关系的顺序很重要
-  dnl 
 
   PHP_ADD_LIBPATH($ROOT_PATH/lib, POLARLOG_SHARED_LIBADD)
   PHP_ADD_LIBRARY(polarlog, 1, POLARLOG_SHARED_LIBADD)
@@ -42,11 +40,8 @@ if test "$PHP_POLARLOG" != "no"; then
   PHP_ADD_LIBRARY(stdc++, 1, POLARLOG_SHARED_LIBADD)
   PHP_ADD_LIBRARY(pthread, 1, POLARLOG_SHARED_LIBADD)
   PHP_ADD_LIBRARY(dl, 1, POLARLOG_SHARED_LIBADD)
-
-
   
   AC_MSG_CHECKING([variables])
-
 
   AC_MSG_RESULT([PHP_POLARLOG=$PHP_POLARLOG POLARLOG_SHARED_LIBADD=$POLARLOG_SHARED_LIBADD])
   PHP_SUBST(POLARLOG_SHARED_LIBADD)
