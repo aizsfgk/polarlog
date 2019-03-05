@@ -1,47 +1,15 @@
-#include "php_polarlog.h"
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-/*
-	zend_string *compiled_filename;
-
-	int zend_lineno;
-
-	CG(zend_lineno)
-
-
-	CG(compiled_filename);
- */
-
-
 #include "php_polarlog.h"
-#include <string>
-
-extern "C" {
-	#include "php.h"
-	#include "php_ini.h"
-	#include "zend_ini.h"
-	#include "ext/standard/info.h"
-	#include "SAPI.h"
-}
 
 static int le_polarlog;
-
 ZEND_DECLARE_MODULE_GLOBALS(polarlog)
-
-// polarlog::Polarlog *g_polarlog_logger = NULL;
-// polarlog::FileAppender g_file_appender;
-
-
-/*
-	如何将这两个值设置为常量值
- */
 
 PHP_INI_BEGIN()
     PHP_INI_ENTRY("polarlog.conf_name", "polarlog.conf", PHP_INI_ALL, NULL)
-    PHP_INI_ENTRY("polarlog.conf_dir",  "/Users/zhangshifeng01/app/polarlog/conf", PHP_INI_ALL, NULL)
+    PHP_INI_ENTRY("polarlog.conf_dir",  "/home/zsf/polarlog/conf", PHP_INI_ALL, NULL)
 PHP_INI_END()
 
 
@@ -54,50 +22,99 @@ PHP_FUNCTION(polarlog_version)
 
 PHP_FUNCTION(polarlog_set_level)
 {
-	zval zv_level;
 
+	char *level;
+	size_t level_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &level, &level_len) == FAILURE) {
+		return;
+	}
+
+	if (strlen(level) == 0) {
+		level = "DEBUG";
+	}
+
+	if (strcasecmp(level, "ERROR") == 0 ||
+		strcasecmp(level, "WARN")  == 0 ||
+		strcasecmp(level, "INFO")  == 0 ||
+		strcasecmp(level, "DEBUG") == 0
+	) {
+		polarlog_set_level(level);
+		RETURN_TRUE;
+	} else {
+		RETURN_FALSE;
+	}
 }
 
 PHP_FUNCTION(polarlog_get_level)
 {
-
+	zend_string *result;
+	const char *level_str = polarlog_get_level();
+	RETURN_STRING(level_str);
 }
 
 
 PHP_FUNCTION(PLOG)
 {
 
-}
+	char *msg, *level;
+	size_t msg_len, level_len;
 
-PHP_FUNCTION(PLOG_WARN)
-{
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss", &level, &level_len, &msg, &msg_len) == FAILURE) {
+		return;
+	}
 
+	if (msg_len >= LOG_MAX_SIZE) {
+		RETURN_FALSE;
+	}
+
+	f_name_line tmp_nl = {0};
+	self_get_code_filename_line(&tmp_nl TSRMLS_DC);
+
+	tmp_nl.name[tmp_nl.len] = '\0';
+	char *file_name = tmp_nl.name;
+
+	int file_line = tmp_nl.line;
+
+	if (strcasecmp(level,"ERROR") == 0) {
+		PHP_LOG(ERROR, file_line, file_name,msg);
+	} else if (strcasecmp(level,"WARN") == 0) {
+		PHP_LOG(WARN, file_line, file_name,msg);
+	} else if (strcasecmp(level,"INFO") == 0) {
+		PHP_LOG(INFO, file_line, file_name,msg);
+	} else {
+		PHP_LOG(DEBUG, file_line, file_name,msg);
+	}
+	
+	RETURN_LONG(msg_len);
 }
 
 PHP_FUNCTION(PLOG_ERROR)
 {
+	PHP_LOG_COMMON(ERROR);
+}
+
+PHP_FUNCTION(PLOG_WARN)
+{
+	PHP_LOG_COMMON(WARN);
 
 }
 
 PHP_FUNCTION(PLOG_INFO)
 {
-
+	PHP_LOG_COMMON(INFO);
 }
 
 PHP_FUNCTION(PLOG_DEBUG)
 {
-
+	PHP_LOG_COMMON(DEBUG);
 }
-
-
 
 PHP_MINIT_FUNCTION(polarlog)
 {
-
 	REGISTER_INI_ENTRIES();
-
-	char *conf_file = INI_STR("polarlog.conf_name");
-	char *conf_dir  = INI_STR("polarlog.conf_dir");
+	const char *conf_file = const_cast<char *>(INI_STR("polarlog.conf_name"));
+	const char *conf_dir  = const_cast<char *>(INI_STR("polarlog.conf_dir"));
 
 	std::string file(conf_file);
 	std::string dir(conf_dir);
@@ -120,7 +137,6 @@ PHP_RINIT_FUNCTION(polarlog)
 	return SUCCESS;
 }
 
-
 PHP_RSHUTDOWN_FUNCTION(polarlog)
 {
 	return SUCCESS;
@@ -137,7 +153,7 @@ PHP_MINFO_FUNCTION(polarlog)
 }
 
 const zend_function_entry polarlog_functions[] = {
-	PHP_FE(polarlog_version,	NULL)		/* For testing, remove later. */
+	PHP_FE(polarlog_version,	NULL)
 	PHP_FE(polarlog_set_level,  NULL)
 	PHP_FE(polarlog_get_level, NULL)
 	PHP_FE(PLOG, NULL)
@@ -147,10 +163,7 @@ const zend_function_entry polarlog_functions[] = {
 	PHP_FE(PLOG_DEBUG, NULL)
 	PHP_FE_END	/* Must be the last line in tou_functions[] */
 };
-/* }}} */
 
-/* {{{ tou_module_entry
- */
 zend_module_entry polarlog_module_entry = {
 	STANDARD_MODULE_HEADER,
 	"polarlog",
@@ -163,7 +176,7 @@ zend_module_entry polarlog_module_entry = {
 	PHP_POLARLOG_VERSION,
 	STANDARD_MODULE_PROPERTIES
 };
-/* }}} */
+
 
 #ifdef COMPILE_DL_POLARLOG
 #ifdef ZTS
@@ -171,3 +184,4 @@ ZEND_TSRMLS_CACHE_DEFINE()
 #endif
 ZEND_GET_MODULE(polarlog)
 #endif
+	

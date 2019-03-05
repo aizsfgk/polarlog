@@ -16,10 +16,10 @@ if test "$PHP_POLARLOG" != "no"; then
   AC_MSG_CHECKING($ROOT_PATH)
 
   if test -r $ROOT_PATH/include/polarlog.h; then
-    AC_MSG_CHECKING([for tou include file found])
+    AC_MSG_CHECKING([for polarlog include file found])
   else
-    AC_MSG_CHECKING([for tou include file not found])
-    AC_MSG_ERROR([please install tou files])
+    AC_MSG_CHECKING([for polarlog include file not found])
+    AC_MSG_ERROR([please install polarlog files])
   fi
 
  

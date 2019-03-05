@@ -15,6 +15,8 @@
 #include "file_appender.h"
 #include "define.h"
 #include "config.h"
+#include <signal.h>
+
 
 const int LEVEL_ERROR = 1;
 const int LEVEL_WARN  = 2;
@@ -68,6 +70,7 @@ public:
 	int get_log_level();
 	int get_log_level(const char *level_str);
 	std::string get_log_level_str(int level);
+	std::string get_log_level_strw(int level);
 	std::string get_now_time(time_t tt);
 	bool get_use_fa();
 	int _check_config_file();
@@ -84,5 +87,8 @@ private:
 };
 
 }
+
+
+extern polarlog::Polarlog *gp_logger;
 
 #endif

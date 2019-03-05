@@ -61,7 +61,7 @@ void Polarlog::log(int level, int line, const char *file, const char *format, va
 		//std::string fin_format = "[%s][%s][%s/%d]" + format;
 
 
-		std::string level_str = get_log_level_str(level);
+		std::string level_str = get_log_level_strw(level);
 		time_t tt = time(NULL);
 		std::string time = get_now_time(tt);
 
@@ -131,6 +131,21 @@ std::string Polarlog::get_log_level_str(int level)
 	if (level == LEVEL_DEBUG)  {
 		return "DEBUG";
 	} else if (level == LEVEL_INFO) {
+		return "INFO";
+	} else if (level == LEVEL_WARN) {
+		return "WARN";
+	} else if (level == LEVEL_ERROR) {
+		return "ERROR";
+	} else {
+		return "NOT KNOW";
+	}
+}
+
+std::string Polarlog::get_log_level_strw(int level)
+{
+	if (level == LEVEL_DEBUG)  {
+		return "DEBUG";
+	} else if (level == LEVEL_INFO) {
 		return "INFO ";
 	} else if (level == LEVEL_WARN) {
 		return "WARN ";
@@ -159,6 +174,9 @@ int polarlog_init(const std::string &file, const std::string &dir)
 
 void polarlog_write(int level, int line, const char *file, const char *format, ...)
 {
+	// printf("level=>%d, line=>%d, file=>%s\n", level, line, file);
+
+	
 	if (level < LEVEL_ERROR) {
 		return;
 	}

@@ -22,39 +22,107 @@
 #define PHP_POLARLOG_H
 
 #include "polarlog.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "php.h"
 #include "php_ini.h"
 #include "zend_ini.h"
 #include "ext/standard/info.h"
 #include "SAPI.h"
 #include "zend_globals_macros.h"
-
+#include "zend_API.h"
+#include <string>
 
 /**
  * php 日志宏
  */
 
-PHP_LOG_ERROR(format, args...) \
-  polarlog_write(LEVEL_ERROR, CG(lineno), CG(filename), format, ##args);
+#define PHP_LOG_ERROR(line, filename, format, args...) \
+  polarlog_write(LEVEL_ERROR, line, filename, format, ##args);
 
-PHP_LOG_WARN(format, args...) \
-  polarlog_write(LEVEL_WARN, CG(lineno), CG(filename), format, ##args);
+#define PHP_LOG_WARN(line, filename, format, args...) \
+  polarlog_write(LEVEL_WARN, line, filename, format, ##args);
 
-PHP_LOG_INFO(format, args...) \
-  polarlog_write(LEVEL_INFO, CG(lineno), CG(filename), format, ##args);
+#define PHP_LOG_INFO(line, filename, format, args...) \
+  polarlog_write(LEVEL_INFO, line, filename, format, ##args);
 
-PHP_LOG_DEBUG(format, args...) \
-  polarlog_write(LEVEL_DEBUG, CG(lineno), CG(filename), format, ##args);
+#define PHP_LOG_DEBUG(line, filename, format, args...) \
+  polarlog_write(LEVEL_DEBUG, line, filename, format, ##args);
 
-PHP_LOG(level, msg) \
-  PHP_LOG_##level("%s", msg) 
+#define PHP_LOG(level, line, name, msg) \
+  PHP_LOG_##level(line, name, "%s", msg) 
 
 
+typedef struct _file_line {
+  char *name;
+  long len;
+  long line;
+} f_name_line;
+
+static void self_get_code_filename_line(f_name_line *nl TSRMLS_DC)
+{
+    char *ret;
+    long code_line = 0;
+    size_t filename_len;
+    int recall_depth = 0;
+
+#if PHP_VERSION_ID >= 70000
+ 
+    zend_execute_data *ptr = EG(current_execute_data);
+    if (!ptr)
+    {
+        return;
+    }
+
+    while(recall_depth >= 0)
+    {
+        if (ptr->prev_execute_data != NULL && ptr->prev_execute_data->func &&
+                ZEND_USER_CODE(ptr->prev_execute_data->func->common.type)
+           )
+        {
+            ptr = ptr->prev_execute_data;
+        }
+        else
+        {
+            break;
+        }
+        recall_depth--;
+    }
+
+    if (ptr->func && ZEND_USER_CODE(ptr->func->type))
+    {
+        ret = ZSTR_VAL(ptr->func->op_array.filename);
+        code_line = ptr->opline->lineno;
+    }
+    
+    nl->name =ret;
+    nl->len  = (long)strlen(ret);
+    nl->line = (long)code_line;
+#endif
+
+}
+
+#define PHP_LOG_COMMON(level) \
+ do { \
+  char *msg; \
+  size_t msg_len; \
+  if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &msg, &msg_len) == FAILURE) { \
+    return; \
+  } \
+  if (msg_len >= LOG_MAX_SIZE) { \
+    RETURN_FALSE; \
+  } \
+  f_name_line tmp_nl = {0}; \
+  self_get_code_filename_line(&tmp_nl TSRMLS_DC); \
+  tmp_nl.name[tmp_nl.len] = '\0'; \
+  char *file_name = tmp_nl.name; \
+  int file_line = tmp_nl.line; \
+  PHP_LOG_##level(file_line, file_name, "%s", msg); \
+  RETURN_LONG(msg_len); \
+} while (0)
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 // 声明模块
@@ -86,7 +154,6 @@ ZEND_END_MODULE_GLOBALS(polarlog);
 #endif
 
 #define POLARLOG_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(polarlog, v)
-
 
 #if defined(ZTS) && defined(COMPILE_DL_TOU)
 ZEND_TSRMLS_CACHE_EXTERN()
