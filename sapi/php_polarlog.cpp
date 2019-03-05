@@ -9,7 +9,7 @@ ZEND_DECLARE_MODULE_GLOBALS(polarlog)
 
 PHP_INI_BEGIN()
     PHP_INI_ENTRY("polarlog.conf_name", "polarlog.conf", PHP_INI_ALL, NULL)
-    PHP_INI_ENTRY("polarlog.conf_dir",  "/home/zsf/polarlog/conf", PHP_INI_ALL, NULL)
+    PHP_INI_ENTRY("polarlog.conf_dir",  "./", PHP_INI_ALL, NULL)
 PHP_INI_END()
 
 
